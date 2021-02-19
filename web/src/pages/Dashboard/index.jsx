@@ -7,7 +7,6 @@ import RemoveTransacao from './Modals/RemoveTransacao/index';
 
 import Header from '../../components/Header';
 import Card from '../../components/Card';
-//import Modal from '../../components/Modal';
 import Footer from '../../components/Footer';
 
 import ImgEntrada from '../../assets/income.svg';
@@ -22,13 +21,43 @@ function Dashboard() {
   const [transactions, SetTransactions] = useState([]);
   const [openModalExcluir, setOpenModalExcluir] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState({});
+  const [income, setIncome] = useState(0);
+  const [expense, setExpense] = useState(0);
+  const [total, setTotal] = useState(0);
+
+  const accountID = localStorage.getItem('accountID');
 
   useEffect(() => {
     listaTransacoes()
   }, [])
 
+  useEffect(() => {
+    totalCards();
+  }, [transactions])
+
+  function totalCards() {
+    let totalIncome = 0;
+    let totalExpense = 0;
+    let result = 0;
+    transactions.map((item) => {
+      if (item.amount > 0) {
+        totalIncome = parseFloat(totalIncome + parseFloat(item.amount));
+      } else {
+        totalExpense = parseFloat(totalExpense + parseFloat(item.amount));
+      }
+    })
+    result = totalIncome + totalExpense;
+    setIncome(totalIncome)
+    setExpense(totalExpense)
+    setTotal(result);
+  }
+
   async function listaTransacoes() {
-    const response = await api.get('/alltransactions');
+    const response = await api.get('/alltransactions', {
+      headers: {
+        authorization: accountID
+      }
+    });
     SetTransactions(response.data);
   }
 
@@ -55,19 +84,23 @@ function Dashboard() {
         <section id="balance">
           <h2 className="sr-only">Balanço</h2>
 
-          <Card pathImage={ImgEntrada} altImage="Imagem de entrada" isTotal={false}>
+          <Card pathImage={ImgEntrada} altImage="Imagem de entrada" isTotal={false} tot={income}>
             Entradas
           </Card>
-          <Card pathImage={ImgSaida} altImage="Imagem de saída" isTotal={false}>
+          <Card pathImage={ImgSaida} altImage="Imagem de saída" isTotal={false} tot={expense}>
             Saídas
           </Card>
-          <Card pathImage={ImgTotal} altImage="Imagem de total" isTotal={true}>
-            Saídas
+          <Card pathImage={ImgTotal} altImage="Imagem de total" isTotal={true} tot={total}>
+            Total
           </Card>
         </section>
 
         <section id="transaction">
           <h2 className="sr-only">Transações</h2>
+
+          <input type="text" placeholder="Descrição"/>
+
+          <button type="button">Pesquisar</button>
 
           <button type="button"
             onClick={() => setOpenModal(true)}

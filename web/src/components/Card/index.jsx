@@ -2,7 +2,7 @@ import React from 'react';
 
 import './styles.css';
 
-function Card({ pathImage, altImage, children, isTotal }) {
+function Card({ pathImage, altImage, children, isTotal, tot }) {
   return (
     <>
       {isTotal ? (
@@ -13,7 +13,7 @@ function Card({ pathImage, altImage, children, isTotal }) {
             </span>
             <img src={pathImage} alt={altImage} />
           </h3>
-          <p id="expenseDisplay">R$ 0,00</p>
+          <p id="expenseDisplay">R$ {tot}</p>
         </div>
       ) : (
           <div className="card">
@@ -23,7 +23,7 @@ function Card({ pathImage, altImage, children, isTotal }) {
               </span>
               <img src={pathImage} alt={altImage} />
             </h3>
-            <p id="expenseDisplay">R$ 0,00</p>
+            <p id="expenseDisplay">R$ {tot}</p>
           </div>
         )
       }

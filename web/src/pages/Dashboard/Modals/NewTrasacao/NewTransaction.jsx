@@ -18,6 +18,8 @@ function ModalNewTransaction({ isOpen, callbackParentFecharNew }) {
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(dataHojeFormat);
 
+  const accountID = localStorage.getItem('accountID');
+
   async function handleSubmit(event) {
     event.preventDefault();
 
@@ -34,7 +36,11 @@ function ModalNewTransaction({ isOpen, callbackParentFecharNew }) {
         date: dateFormated
       }
 
-      await api.post('/newtransaction', transaction)
+      await api.post('/newtransaction', transaction, {
+        headers: {
+          authorization: accountID,
+        }
+      })
       callbackParentFecharNew();
 
     } catch (err) {
