@@ -2,26 +2,30 @@ const dataBase = require('../database/connection');
 
 module.exports = {
   async allTransactions(request, response) {
-    const allTransactions = await dataBase('transactions').select('*');
+    const account_id = request.headers.authorization;
+
+    const allTransactions = await dataBase('transactions')
+      .join('accounts', 'accounts.id', '=', 'transactions.account_id')
+      .where('accounts.id', '=', `${account_id}`)
+      .select([
+        'transactions.*'
+      ])
 
     return response.json(allTransactions);
   },
 
   async createTransaction(request, response) {
     const { description, amount, date } = request.body;
+    const account_id = request.headers.authorization;
 
-    const transaction = {
-      description,
-      amount,
-      date
-    }
     await dataBase('transactions').insert({
       description,
       amount,
-      date
+      date,
+      account_id
     });
 
-    return response.status(201).json(transaction);
+    return response.status(201).json({ "message": "Criado com sucesso !" });
   },
 
   async delete(request, response) {
