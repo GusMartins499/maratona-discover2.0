@@ -24,36 +24,33 @@ function Dashboard() {
   const [income, setIncome] = useState(0);
   const [expense, setExpense] = useState(0);
   const [total, setTotal] = useState(0);
+  const [description, setDescription] = useState('');
 
   const accountID = localStorage.getItem('accountID');
 
   useEffect(() => {
-    listaTransacoes()
+    listaTransacoes();
+    totalCards();
   }, [])
 
   useEffect(() => {
     totalCards();
   }, [transactions])
 
-  function totalCards() {
-    let totalIncome = 0;
-    let totalExpense = 0;
-    let result = 0;
-    transactions.map((item) => {
-      if (item.amount > 0) {
-        totalIncome = parseFloat(totalIncome + parseFloat(item.amount));
-      } else {
-        totalExpense = parseFloat(totalExpense + parseFloat(item.amount));
+  async function totalCards() {
+    const response = await api.get('/totalcards', {
+      headers: {
+        authorization: accountID
       }
-    })
-    result = totalIncome + totalExpense;
-    setIncome(totalIncome)
-    setExpense(totalExpense)
-    setTotal(result);
+    });
+    console.log(response.data[0])
+    setIncome(response.data[0].income === null ? 0 : response.data[0].income)
+    setExpense(response.data[0].expense === null ? 0 : response.data[0].expense)
+    setTotal(response.data[0].total === null ? 0 : response.data[0].total);
   }
 
   async function listaTransacoes() {
-    const response = await api.get('/alltransactions', {
+    const response = await api.get(`/alltransactions?description=${description}`, {
       headers: {
         authorization: accountID
       }
@@ -98,9 +95,9 @@ function Dashboard() {
         <section id="transaction">
           <h2 className="sr-only">Transações</h2>
 
-          <input type="text" placeholder="Descrição"/>
+          <input type="text" placeholder="Descrição" value={description} onChange={(e) => setDescription(e.target.value)} />
 
-          <button type="button">Pesquisar</button>
+          <button type="button" onClick={() => listaTransacoes()}>Pesquisar</button>
 
           <button type="button"
             onClick={() => setOpenModal(true)}
@@ -143,6 +140,8 @@ function Dashboard() {
       <RemoveTransacao isOpen={openModalExcluir}
         callbackParentFecharRemove={() => handleFecharModalRemove()}
         transaction={selectedTransaction} />
+
+
     </>
   );
 }
