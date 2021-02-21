@@ -9,6 +9,7 @@ const routes = express.Router();
 routes.get('/alltransactions', TransactionsController.allTransactions);
 routes.post('/newtransaction', TransactionsController.createTransaction);
 routes.delete('/removetransaction/:id', TransactionsController.delete);
+routes.get('/totalcards', TransactionsController.cardsTotal);
 
 routes.post('/newaccount', AccountController.create);
 
